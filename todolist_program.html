@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style type="text/css">
+    .main{
+      width: 505px;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      margin: auto;
+    }
+    body{
+      width : 100%;
+			margin : 0 auto;
+			padding : 0;
+			border : none;
+      min-height: 100vh;
+
+			/* 그라데이션 : 오른쪽 아래에서 왼쪽 위 */
+			background : linear-gradient(to top left, #000000 20%, #33ccff 60%, #ff00cc);
+
+			float : top;
+			position : relative;
+			top : 20%;
+			left : 0%;
+    }
+    h1{
+      text-align:center;
+      display: inline;
+    }
+
+    /* 추가할 아이템을 작성하는 칸 */
+    input[type="text"]{
+      width: 390px;
+      height: 30px;
+      border: none;
+      font-size: 1.5em;
+      background: white;
+      margin-right: 10px;
+      padding: 5px;
+    }
+
+    /* Add버튼 */
+    #addtolist{
+       width: 85px;
+       height: 40px;
+       font-size: 1.5em;
+       background-color: #ccffff;
+       border-radius: 4px;
+       outline: 0;
+       border: none;
+     }
+
+     /* 전체완료, 전체선택 버튼들 스타일 */
+     button[type="button"]{
+       width: 85px;
+       height: 40px;
+       font-size: 1em;
+       float: right;
+       margin-top: 20px;
+       background-color: #ff3399;
+       border-radius: 4px;
+       border: none;
+     }
+     /* 전체삭제 버튼 */
+     #allClear{
+
+      }
+
+    /* 전체완료 버튼 */
+    #allSelect{
+      margin-right: 20px;
+    }
+
+    /* 할 일 리스트 */
+    .todolist{
+      background-color: white;
+      margin-top: 20px;
+      padding: 10px 40px 10px 0px;
+    }
+    ul{
+      list-style: none;
+    }
+    li{
+      border-bottom: 1px solid lightgrey; /*할일이 구별되도록 */
+      padding-bottom: 15px;
+      padding-top: 15px;
+      font-size: 1.3em;
+    }
+
+  /* 짝수와 홀수줄을 교대로 색상 다르게 */
+  .even{
+    background-color: #00f0c6 ;
+  }
+
+  /* 할일 리스트에 마우스가 올라가면 색상이 변한다.  */
+  .hovering{
+    background-color: #64f024;
+    color: white;
+  }
+
+  /* 완료된 할일은 어두운 색으로 바뀌고, 텍스트 가운데 줄이 그어진다.  */
+  .complete {
+    background-color: gray;
+    text-decoration: line-through;
+  }
+
+  /* 제목태그 옆 이미지 양쪽에 나란히 삽입 */
+  img{
+    width: 50px;
+    height: 50px;
+    display: inline;
+  }
+
+  </style>
+  <script src="jquery-3.6.0.js"></script>
+  <script>
+    // Add버튼을 눌렀을 때 작성한 항목들이 목록에 추가
+    function addTodoItem(){
+      var li=$("#new_item").val();
+      $('#todo_list').append("<label><li name='done'class='done'>"+
+      "<input type='checkbox'"+
+        " name='item_done'" +
+        " class='item_done'"+"' /> " +li+
+      " <button class='item_remove'>X</button></li></label>");
+
+      // 추가기능: Add버튼을 누르면 칸에 있던 글씨는 지워지고, 할일 리스트 목록으로 생성
+      $("#new_item").val("");
+
+      //홀수줄과 짝수줄을 교대로 색상을 다르도록 구성
+      //추가기능: 할일이 중간에 삭제 되었으면 새로운 할일이 추가 될시에 다시 구성
+      for(var i=0; i < $('li').length ;i++){
+        if(i%2==1){
+          var domElement=$('li').get(i);
+          $(domElement).addClass('even');
+        }
+        else{
+          var domElement=$('li').get(i);
+          $(domElement).removeClass('even');
+        }
+
+        //마우스를 갖다대면 항목 색 변경
+        $('li').hover(function(){
+          $(this).addClass('hovering');
+        },function(){//마우스를 떼면 다시 원래대로 색 변경
+          $(this).removeClass('hovering');
+        });
+
+      };
+    };
+    //x버튼을 누르면 항목이 지워진다.
+    function removeTodoItem(item) {
+      $(item).parent().remove();
+    }
+
+    //할일 자체를 클릭하면, 완료되었다는 의미로 왼쪽에 체크가 표시되고,
+    //추가기능: 왼쪽 체크박스를 눌러도 체크 가능
+    function completeTodoItem(){
+      $(this).parent().toggleClass("complete");
+    }
+
+    //전체완료를 누르면 모든 아이템이 어두운색으로 변하고, 텍스트 중간에 줄이 그어진다.
+    function allComplete(){
+      $('.item_done').parent().addClass("complete");
+
+      //전체 완료를 누르면 모든 아이템들에 체크 표시 된다.
+      var checking2 = $('.item_done').is(':checked');
+      $('.item_done').prop('checked',true);
+
+    }
+
+    $(function(){
+      //추가기능: 제목태그를 누르면 제작자 정보가 뜬다.(1회만 가능)
+      $('h1').one('click',function(event){
+
+        alert("제작자: 2019E7325 조혜연");
+      });
+
+      //추가기능: 제목 태그 옆에 todolist의 상징적 이미지 삽입
+      $('img').each(function(index,element){
+        $(this).attr('src',(index+1)+'.png');
+      });
+
+      //Add버튼을 누르면 아이템 추가
+      $("#addtolist").on("click",function(){
+        addTodoItem();
+    });
+
+    //추가기능: 모든 할일을 다 했을 때 전체완료를 누르면, 모든 할일이 선택된다.
+    $('#allSelect').on('click',function(){
+      allComplete();
+    })
+
+    //추가기능: 전체 삭제를 누르면 모두 지워짐
+    $('#allClear').on('click',function(){
+      $('li').remove();
+    });
+
+    //x버튼을 누르면 지워진다.
+    $('#todo_list').on('click','.item_remove',function(){
+      var item=this;
+      removeTodoItem(item)
+    });
+
+    //완료표시에 체크가 되어있으면, 완료된 할 일까지 보여준다.
+    //완료표시에 체크가 되어있지 않으면, 완료된 할일을 제외하고 보여준다.
+    $('#complete_item').on('click',function(){
+
+      var checking = $('#complete_item').is(':checked');//완료표시에 체크가 되어있는지/안되어있는지 확인
+      var checking1 = $('.item_done').is(':checked');//아이템들에 체크가 되어있는지/안되어있는지 확인
+
+      if(checking==true)//완료표시에 체크: 완료된 것도 모두 표시
+      {
+        if(checking1==true)//완료 된 할 일들을 보여준다.
+        {
+          $('li.done.complete').show();
+        }
+      }
+		  else//완료표시에 체크x: 완료한것은 표시 x
+      {
+        if(checking1==true)//완료 된 할일들은 감춘다.
+        {
+          $('li.done.complete').hide();
+        }
+      }
+    });
+
+    $(document).on('click', ".item_done", completeTodoItem); //추가된 할 일 자체를 클릭하면 왼쪽에 체크표시
+
+  });
+
+  </script>
+</head>
+<body>
+
+  <div class="main">
+    <!-- 추가기능: h1태그옆 todolist를 나타내는 상징적 이미지로 디자인 -->
+      <h1><img />Let's make a ToDoList<img /></h1>
+
+    <div class="display">
+      <!-- 완료표시에는 체크가 되어있는 것이 기본값이다. -->
+      <input type="checkbox" id="complete_item" class="complete_item" checked="checked"><label>완료표시</label>
+    </div>
+
+    <!-- 추가할 할일을 적는 칸과 추가하기 위해 누르는 버튼 -->
+    <div class="task">
+      <input type="text" id="new_item" class="new_item" placeholder="Add To List" name="todo">
+      <button type="button1" id="addtolist"><b>Add</b></button>
+    </div>
+
+    <!-- 추가된 할일들 목록 -->
+    <div class="todolist">
+      <ul id="todo_list" class="todo_list">
+      </ul>
+    </div>
+
+    <!-- 전체삭제, 전체완료 버튼 -->
+    <div class="button_zip">
+    <button type="button" id="allClear">전체삭제</button>
+    <button type="button" id="allSelect">전체완료</button>
+    </div>
+
+  </div>
+</body>
+</html>
